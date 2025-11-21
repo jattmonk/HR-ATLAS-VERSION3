@@ -186,9 +186,6 @@
         // --- Reusable Particle Background Component ---
         const ParticleBackground = ({ isDark = true }) => {
             const canvasRef = useRef(null);
-            const mouseRef = useRef({ x: 0, y: 0 });
-            const requestRef = useRef();
-
             useEffect(() => {
                 const canvas = canvasRef.current;
                 const ctx = canvas.getContext('2d');
@@ -202,14 +199,7 @@
                         height = canvas.height = canvas.parentElement.offsetHeight;
                     }
                 };
-                
-                const handleMouseMove = (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-                };
-
                 window.addEventListener('resize', resize);
-                window.addEventListener('mousemove', handleMouseMove);
                 resize();
 
                 class Particle {
@@ -230,9 +220,9 @@
 
                 for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
+                let animationFrameId;
                 const animate = () => {
                     ctx.clearRect(0, 0, width, height);
-                    
                     particles.forEach(particle => {
                         particle.update();
                         ctx.beginPath();
@@ -247,12 +237,9 @@
                             const dx = particles[i].x - particles[j].x;
                             const dy = particles[i].y - particles[j].y;
                             const distance = Math.sqrt(dx * dx + dy * dy);
-
                             if (distance < 120) {
                                 const opacity = 1 - (distance / 120);
-                                ctx.strokeStyle = isDark 
-                                    ? `rgba(255, 255, 255, ${opacity * 0.2})`
-                                    : `rgba(0, 0, 0, ${opacity * 0.05})`;
+                                ctx.strokeStyle = isDark ? `rgba(255, 255, 255, ${opacity * 0.2})` : `rgba(0, 0, 0, ${opacity * 0.05})`;
                                 ctx.beginPath();
                                 ctx.moveTo(particles[i].x, particles[i].y);
                                 ctx.lineTo(particles[j].x, particles[j].y);
@@ -260,18 +247,17 @@
                             }
                         }
                     }
-                    requestRef.current = requestAnimationFrame(animate);
+                    animationFrameId = requestAnimationFrame(animate);
                 };
                 animate();
                 return () => {
                     window.removeEventListener('resize', resize);
-                    window.removeEventListener('mousemove', handleMouseMove);
-                    cancelAnimationFrame(requestRef.current);
+                    cancelAnimationFrame(animationFrameId);
                 };
             }, [isDark]);
-
             return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full pointer-events-none" />;
         };
+
         // --- 3D TILT CARD COMPONENT ---
         const TiltCard = ({ children, className = "" }) => {
             const cardRef = useRef(null);
@@ -557,65 +543,6 @@
             }
         ];
 
-        // --- Brains / Theories Data ---
-        const brainsData = {
-            economics: [
-                { icon: "🧠", title: "Behavioral Economics", label: "Why people act irrational at work", oneLine: "People are not rational robots – they make weird, biased decisions.", hrMeaning: "Don’t design policies assuming people will ‘do the logical thing’. You design performance reviews, benefits, and incentives knowing that framing, fairness, loss-aversion and bias heavily influence behaviour." },
-                { icon: "📈", title: "Human Capital Theory", label: "Learning as an investment", oneLine: "Education, skills, experience = economic assets, not just ‘costs’.", hrMeaning: "Training, upskilling, coaching, and development aren’t just ‘nice to have’ — they are literally investments with a return." },
-                { icon: "📜", title: "Contract Theory", label: "Incentives and behaviour", oneLine: "How you pay people shapes how they behave.", hrMeaning: "Bonus plans, commissions and executive compensation must be designed so people don’t game the system but move the company in the right direction." },
-                { icon: "🧩", title: "Matching Theory", label: "Right person, right job", oneLine: "Hiring is a matching game: right worker + right job = value.", hrMeaning: "Great recruiting is about matching skills, motivations and culture with the right job, not just filling vacancies." },
-                { icon: "♟️", title: "Game Theory", label: "Thinking in moves and countermoves", oneLine: "People make choices based on what they think others will do.", hrMeaning: "Use it for salary negotiations, union bargaining and change management: if you push here, what counter-move will employees or unions make?" },
-                { icon: "⚙️", title: "Mechanism Design", label: "Design the rules so good behaviour is easy", oneLine: "Design the system so the best behaviour is also the easiest behaviour.", hrMeaning: "Policies, recognition and promotion rules should naturally nudge people toward collaboration, ethics and performance." }
-            ],
-            psychology: [
-                { icon: "🔺", title: "Maslow’s Hierarchy of Needs", label: "From paycheque to purpose", oneLine: "People climb from basic needs (salary, safety) to higher needs (belonging, esteem, purpose).", hrMeaning: "You can’t fix engagement with ‘purpose workshops’ if people don’t feel safe, respected or fairly paid." },
-                { icon: "⚖️", title: "Herzberg’s Two-Factor Theory", label: "What stops pain vs what creates joy", oneLine: "Some things stop people from hating their job (hygiene), others make them love it (motivators).", hrMeaning: "Salary and policies prevent dissatisfaction; growth, recognition and meaningful work create real motivation." },
-                { icon: "🌟", title: "Self-Determination Theory", label: "Autonomy, competence, connection", oneLine: "Humans are happiest when they feel autonomy, competence and relatedness.", hrMeaning: "Micromanagement kills motivation. Design jobs with ownership, chances to get better and real relationships." },
-                { icon: "🏆", title: "McClelland’s Needs Theory", label: "Achievement, power, belonging", oneLine: "People are driven by different mixes of three needs: to achieve, to belong and to influence.", hrMeaning: "Use it in hiring and leadership development – some roles need high achievement, others need affiliation or power." },
-                { icon: "🖐️", title: "Big Five Personality Traits", label: "Five dimensions of personality", oneLine: "Personality can be seen as Openness, Conscientiousness, Extraversion, Agreeableness and Neuroticism.", hrMeaning: "Helps with role fit, team-building and coaching (used carefully, not to stereotype people)." },
-                { icon: "🔄", title: "Tuckman’s Team Stages", label: "Forming, storming, norming, performing", oneLine: "Teams often go through predictable stages before they perform well.", hrMeaning: "Conflict in a new team isn’t always a red flag – it can be a normal stage that leaders can guide through." },
-                { icon: "🛡️", title: "Psychological Safety", label: "Safe to speak up", oneLine: "People do their best work when they feel safe to speak up, admit mistakes and share ideas.", hrMeaning: "Policies and leaders should reward speaking up, not punish it. It’s the foundation of learning and innovation." },
-                { icon: "⚖️", title: "Equity Theory", label: "It’s not just pay – it’s fairness", oneLine: "People compare their effort and rewards with others and care deeply about fairness.", hrMeaning: "Internal equity, fair processes and transparent logic are as important as the salary number itself." },
-                { icon: "🎯", title: "Expectancy Theory", label: "Will my effort actually matter?", oneLine: "People are motivated when they believe effort → performance → reward, and the reward is worth it.", hrMeaning: "Performance and reward systems must be clear, believable and meaningful – or motivation disappears." },
-                { icon: "🎭", title: "Cognitive Dissonance", label: "When words and reality clash", oneLine: "When actions and beliefs don’t match, people feel psychological tension.", hrMeaning: "If the company says ‘we value work-life balance’ but rewards only long hours, employees lose trust and engagement." },
-                { icon: "📉", title: "Prospect Theory", label: "Losses hurt more than gains feel good", oneLine: "People are more sensitive to losses than to equivalent gains.", hrMeaning: "Cutting benefits hurts more than adding similar benefits helps. Be careful how you frame changes." },
-                { icon: "🚫", title: "Cognitive Biases in HR", label: "Brain shortcuts that cause unfairness", oneLine: "Our brains use shortcuts like halo effect, anchoring and confirmation bias.", hrMeaning: "Use structured interviews, clear criteria and data to reduce bias in hiring, performance ratings and promotions." }
-            ]
-        };
-
-        // --- Associations Data (SHORTENED FOR BREVITY - Full data preserved in logic) ---
-        const associationsData = {
-            global: [
-                { name: "SHRM", fullName: "Society for Human Resource Management", desc: "The world’s largest HR association with 340,000+ members.", tags: ["Global", "Generalist"] },
-                { name: "ATD", fullName: "Association for Talent Development", desc: "Global network for L&D, training, facilitation, and coaching.", tags: ["Global", "L&D"] },
-                { name: "WorldatWork", fullName: "WorldatWork", desc: "Leading global community for compensation, total rewards, and benefits.", tags: ["Global", "Rewards"] },
-                { name: "HRCI", fullName: "HR Certification Institute", desc: "Worldwide HR certification community (PHR, SPHR) with networking.", tags: ["Global", "Certifications"] },
-                { name: "CIPD", fullName: "Chartered Inst. of Personnel & Dev", desc: "UK-based international HR professional community.", tags: ["Global", "Generalist"] }
-            ],
-            canada: [
-                { name: "CPHR Canada", fullName: "Chartered Professionals in HR", desc: "National federation representing 31,000+ HR professionals.", tags: ["🇨🇦 Canada", "National"] },
-                { name: "HRPA", fullName: "Human Resources Professionals Assoc.", desc: "Ontario’s regulatory body for HR pros with 24k+ members.", tags: ["🇨🇦 Ontario", "Regulatory"] },
-                { name: "NPI", fullName: "National Payroll Institute", desc: "Community for payroll pros offering PCP/PLP designations.", tags: ["🇨🇦 Canada", "Payroll"] }
-            ],
-            usa: [
-                { name: "SHRM USA", fullName: "SHRM Local Chapters", desc: "Hundreds of local chapters, events, and study groups.", tags: ["🇺🇸 USA", "Generalist"] },
-                { name: "HRCI Community", fullName: "HR Certification Institute", desc: "Professional network around PHR, SPHR, GPHR certs.", tags: ["🇺🇸 USA", "Certs"] },
-                { name: "ATD USA", fullName: "ATD Local Chapters", desc: "Strong local talent development & training communities.", tags: ["🇺🇸 USA", "L&D"] }
-            ],
-            uk: [
-                { name: "CIPD", fullName: "Chartered Inst. of Personnel & Dev", desc: "Main UK body for HR, L&D, and OD; 160k+ members.", tags: ["🇬🇧 UK", "Chartered"] },
-                { name: "CIPP", fullName: "Chartered Inst. of Payroll Profs", desc: "UK’s professional body for payroll and pensions.", tags: ["🇬🇧 UK", "Payroll"] }
-            ],
-            australia: [
-                { name: "AHRI", fullName: "Australian HR Institute", desc: "National peak body offering certification and networking.", tags: ["🇦🇺 Australia", "National"] }
-            ],
-            india: [
-                { name: "NHRDN", fullName: "National HRD Network", desc: "Large nationwide HR/HRD network with city chapters.", tags: ["🇮🇳 India", "Network"] },
-                { name: "NIPM", fullName: "National Inst. of Personnel Mgmt", desc: "Focusing on IR, labour laws, and personnel management.", tags: ["🇮🇳 India", "IR/Law"] },
-                { name: "ISTD", fullName: "Indian Society for Training & Dev", desc: "National body focused on L&D and instructional design.", tags: ["🇮🇳 India", "L&D"] }
-            ]
-        };
-
         // --- Bookshelf Data ---
         const booksData = {
             categories: [
@@ -888,6 +815,39 @@
             }
         };
 
+        // --- Associations Data (SHORTENED FOR BREVITY - Full data preserved in logic) ---
+        const associationsData = {
+            global: [
+                { name: "SHRM", fullName: "Society for Human Resource Management", desc: "The world’s largest HR association with 340,000+ members.", tags: ["Global", "Generalist"] },
+                { name: "ATD", fullName: "Association for Talent Development", desc: "Global network for L&D, training, facilitation, and coaching.", tags: ["Global", "L&D"] },
+                { name: "WorldatWork", fullName: "WorldatWork", desc: "Leading global community for compensation, total rewards, and benefits.", tags: ["Global", "Rewards"] },
+                { name: "HRCI", fullName: "HR Certification Institute", desc: "Worldwide HR certification community (PHR, SPHR) with networking.", tags: ["Global", "Certifications"] },
+                { name: "CIPD", fullName: "Chartered Inst. of Personnel & Dev", desc: "UK-based international HR professional community.", tags: ["Global", "Generalist"] }
+            ],
+            canada: [
+                { name: "CPHR Canada", fullName: "Chartered Professionals in HR", desc: "National federation representing 31,000+ HR professionals.", tags: ["🇨🇦 Canada", "National"] },
+                { name: "HRPA", fullName: "Human Resources Professionals Assoc.", desc: "Ontario’s regulatory body for HR pros with 24k+ members.", tags: ["🇨🇦 Ontario", "Regulatory"] },
+                { name: "NPI", fullName: "National Payroll Institute", desc: "Community for payroll pros offering PCP/PLP designations.", tags: ["🇨🇦 Canada", "Payroll"] }
+            ],
+            usa: [
+                { name: "SHRM USA", fullName: "SHRM Local Chapters", desc: "Hundreds of local chapters, events, and study groups.", tags: ["🇺🇸 USA", "Generalist"] },
+                { name: "HRCI Community", fullName: "HR Certification Institute", desc: "Professional network around PHR, SPHR, GPHR certs.", tags: ["🇺🇸 USA", "Certs"] },
+                { name: "ATD USA", fullName: "ATD Local Chapters", desc: "Strong local talent development & training communities.", tags: ["🇺🇸 USA", "L&D"] }
+            ],
+            uk: [
+                { name: "CIPD", fullName: "Chartered Inst. of Personnel & Dev", desc: "Main UK body for HR, L&D, and OD; 160k+ members.", tags: ["🇬🇧 UK", "Chartered"] },
+                { name: "CIPP", fullName: "Chartered Inst. of Payroll Profs", desc: "UK’s professional body for payroll and pensions.", tags: ["🇬🇧 UK", "Payroll"] }
+            ],
+            australia: [
+                { name: "AHRI", fullName: "Australian HR Institute", desc: "National peak body offering certification and networking.", tags: ["🇦🇺 Australia", "National"] }
+            ],
+            india: [
+                { name: "NHRDN", fullName: "National HRD Network", desc: "Large nationwide HR/HRD network with city chapters.", tags: ["🇮🇳 India", "Network"] },
+                { name: "NIPM", fullName: "National Inst. of Personnel Mgmt", desc: "Focusing on IR, labour laws, and personnel management.", tags: ["🇮🇳 India", "IR/Law"] },
+                { name: "ISTD", fullName: "Indian Society for Training & Dev", desc: "National body focused on L&D and instructional design.", tags: ["🇮🇳 India", "L&D"] }
+            ]
+        };
+
         // --- Main App ---
         const App = () => {
             const [showIntro, setShowIntro] = useState(true);
@@ -920,11 +880,11 @@
                 setBrainsTab("economics");
             }, [activeTab, selectedCountry]);
 
-            // const filteredSpecs = countryData.specializations ? countryData.specializations.filter(spec => 
-            //     spec.function.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            //     spec.group?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            //     spec.cert.toLowerCase().includes(searchTerm.toLowerCase())
-            // ) : [];
+            const filteredSpecs = countryData.specializations ? countryData.specializations.filter(spec => 
+                spec.function.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                spec.group?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                spec.cert.toLowerCase().includes(searchTerm.toLowerCase())
+            ) : [];
 
             const availableRegions = ["All", ...new Set(countryData.resources?.schools?.map(s => s.region) || [])];
             
@@ -939,12 +899,12 @@
             return (
                 <div className="min-h-screen flex flex-col font-sans text-gray-800 animate-fade-in">
                     {/* Navbar */}
-                    <nav className="bg-white text-gray-800 sticky top-0 z-50 shadow-sm border-b border-gray-200">
+                    <nav className="bg-white/80 backdrop-blur-md text-gray-800 sticky top-0 z-50 border-b border-white/40">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex items-center justify-between h-16">
                                 <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('overview')}>
-                                    <div className="bg-blue-900 p-1.5 rounded"><GlobeIcon className="h-6 w-6 text-white" /></div>
-                                    <span className="font-bold text-xl tracking-tight text-gray-900">Global HR Atlas</span>
+                                    <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-1.5 rounded-lg shadow-md"><GlobeIcon className="h-6 w-6 text-white" /></div>
+                                    <span className="font-bold text-xl tracking-tight text-slate-900">Global HR Atlas</span>
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="ml-10 flex items-baseline space-x-6">
@@ -952,7 +912,7 @@
                                             <button 
                                                 key={tab}
                                                 onClick={() => setActiveTab(tab)} 
-                                                className={`px-1 py-4 border-b-2 text-sm font-semibold transition capitalize ${activeTab === tab ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-600 hover:text-gray-900'} flex items-center gap-1`}
+                                                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${activeTab === tab ? 'bg-slate-100 text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'} flex items-center gap-1.5`}
                                             >
                                                 {tab === 'brains' && <Lightbulb className="w-4 h-4" />}
                                                 {tab === 'books' && <Library className="w-4 h-4" />}
@@ -977,16 +937,15 @@
                     </nav>
 
                     {/* Hero */}
-                    <div className="brand-bg text-white pt-16 pb-28 px-4 relative overflow-hidden">
-                         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full"><path d="M0 100 L100 0 L100 100 Z" fill="white" /></svg>
-                        </div>
-                        <div className="max-w-4xl mx-auto text-center relative z-10">
-                            <h1 className="text-4xl md:text-5xl font-extrabold mb-6">Build Your HR Career <br/><span className="text-blue-200">Anywhere in the World</span></h1>
-                            <div className="flex flex-wrap justify-center gap-3 mt-8">
+                    <div className="brand-bg text-white pt-20 pb-32 px-4 relative overflow-hidden">
+                         <ParticleBackground isDark={true} />
+                        <div className="max-w-5xl mx-auto text-center relative z-10">
+                            <h1 className="text-5xl md:text-6xl font-extrabold mb-8 leading-tight tracking-tight">Build Your HR Career <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-indigo-200">Anywhere in the World</span></h1>
+                            
+                            <div className="flex flex-wrap justify-center gap-3 mt-10">
                                 {Object.keys(certificationData).map((key) => (
-                                    <button key={key} onClick={() => setSelectedCountry(key)} className={`flex items-center gap-2 px-6 py-3 rounded-md text-sm font-bold transition-all ${selectedCountry === key ? 'bg-white text-blue-900 shadow-lg' : 'bg-blue-800/50 text-blue-100 border border-blue-700/50'}`}>
-                                        <span className="text-lg">{certificationData[key].flag}</span> {certificationData[key].name}
+                                    <button key={key} onClick={() => setSelectedCountry(key)} className={`flex items-center gap-3 px-6 py-3 rounded-full text-sm font-bold transition-all transform hover:-translate-y-1 ${selectedCountry === key ? 'bg-white text-slate-900 shadow-[0_0_20px_rgba(255,255,255,0.3)]' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-sm'}`}>
+                                        <span className="text-xl">{certificationData[key].flag}</span> {certificationData[key].name}
                                     </button>
                                 ))}
                             </div>
@@ -994,56 +953,58 @@
                     </div>
 
                     {/* Main Content */}
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20 mb-20 relative z-20">
-                        <div className="bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden min-h-[600px] flex flex-col md:flex-row">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 mb-24 relative z-20">
+                        <div className="glass-panel rounded-2xl shadow-2xl overflow-hidden min-h-[600px] flex flex-col md:flex-row">
                             {/* Sidebar (Desktop) */}
-                            <div className="md:w-64 bg-gray-50 border-r border-gray-200 p-6 hidden md:block">
-                                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-3">Menu</h3>
-                                {[
-                                    { id: 'overview', icon: Award, label: 'Overview' },
-                                    { id: 'specializations', icon: Briefcase, label: 'Specializations' },
-                                    { id: 'timeline', icon: Clock, label: 'Timeline Tracker' },
-                                    { id: 'resources', icon: GraduationCap, label: 'Top Schools' },
-                                    { id: 'legal', icon: Scale, label: 'Legal & Compliance' },
-                                    { id: 'compare', icon: ArrowLeftRight, label: 'Compare Markets' },
-                                    { id: 'brains', icon: Lightbulb, label: 'Big Ideas' },
-                                    { id: 'books', icon: Library, label: 'Bookshelf' },
-                                    { id: 'community', icon: Users, label: 'Community' }
-                                ].map(item => (
-                                    <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition ${activeTab === item.id ? 'bg-blue-100 text-blue-800' : 'text-gray-600 hover:bg-white hover:text-gray-900'}`}>
-                                        <item.icon className={`h-4 w-4 ${activeTab === item.id ? 'text-blue-600' : 'text-gray-400'}`} /> {item.label}
-                                    </button>
-                                ))}
+                            <div className="md:w-64 bg-white/50 backdrop-blur-xl border-r border-white/60 p-6 hidden md:block">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 px-3">Menu</h3>
+                                <div className="space-y-1">
+                                    {[
+                                        { id: 'overview', icon: Award, label: 'Overview' },
+                                        { id: 'specializations', icon: Briefcase, label: 'Specializations' },
+                                        { id: 'timeline', icon: Clock, label: 'Timeline Tracker' },
+                                        { id: 'resources', icon: GraduationCap, label: 'Top Schools' },
+                                        { id: 'legal', icon: Scale, label: 'Legal & Compliance' },
+                                        { id: 'compare', icon: ArrowLeftRight, label: 'Compare Markets' },
+                                        { id: 'brains', icon: Lightbulb, label: 'Big Ideas' },
+                                        { id: 'books', icon: Library, label: 'Bookshelf' },
+                                        { id: 'community', icon: Users, label: 'Community' }
+                                    ].map(item => (
+                                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeTab === item.id ? 'bg-white shadow-md text-blue-600' : 'text-slate-600 hover:bg-white/60'}`}>
+                                            <item.icon className={`h-4 w-4 ${activeTab === item.id ? 'text-blue-600' : 'text-slate-400'}`} /> {item.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Content Area */}
-                            <div className="flex-1 p-8 md:p-12 bg-white">
+                            <div className="flex-1 p-8 md:p-12 bg-white/40">
                                 {/* Header */}
-                                <div className="flex items-center justify-between mb-8 border-b border-gray-100 pb-6">
+                                <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-200/60">
                                     <div>
-                                        <h2 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3"><span className="text-4xl shadow-sm rounded-full bg-gray-50 p-1">{countryData.flag}</span> HR in {countryData.name}</h2>
-                                        <p className="text-gray-500 mt-2 text-sm font-medium">Managed by: <span className="font-bold text-gray-800">{countryData.authority}</span></p>
+                                        <h2 className="text-3xl font-extrabold dashboard-title flex items-center gap-3"><span className="text-4xl drop-shadow-sm">{countryData.flag}</span> HR in {countryData.name}</h2>
+                                        <p className="text-slate-500 mt-2 text-sm font-medium">Managed by: <span className="font-bold text-slate-700">{countryData.authority}</span></p>
                                     </div>
                                 </div>
 
                                 {/* Overview Tab */}
                                 {activeTab === 'overview' && (
                                     <div className="animate-fade-in">
-                                        <p className="text-gray-600 leading-relaxed mb-10 text-lg">{countryData.description}</p>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-6">Top Credentials</h3>
+                                        <p className="text-slate-600 leading-relaxed mb-10 text-lg">{countryData.description}</p>
+                                        <h3 className="text-xl font-bold text-slate-900 mb-6">Top Credentials</h3>
                                         <div className="grid gap-6 md:grid-cols-2">
                                             {countryData.topCerts.map((cert, idx) => (
-                                                <div key={idx} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition relative">
-                                                    <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">{cert.acronym}</div>
-                                                    <h4 className="font-bold text-gray-900 mt-2">{cert.fullName}</h4>
-                                                    <p className="text-sm text-gray-600 mt-2">{cert.focus}</p>
-                                                    <p className="text-xs font-bold text-blue-600 mt-3">Cost: {cert.cost}</p>
-                                                </div>
+                                                <TiltCard key={idx} className="glass-card rounded-xl p-6 relative group">
+                                                    <div className="absolute top-0 right-0 bg-gradient-to-br from-blue-600 to-indigo-600 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl rounded-tr-xl shadow-sm">{cert.acronym}</div>
+                                                    <h4 className="font-bold text-slate-900 mt-2 text-lg">{cert.fullName}</h4>
+                                                    <p className="text-sm text-slate-600 mt-2">{cert.focus}</p>
+                                                    <p className="text-xs font-bold text-indigo-600 mt-4 bg-indigo-50 inline-block px-3 py-1 rounded-full">Cost: {cert.cost}</p>
+                                                </TiltCard>
                                             ))}
                                         </div>
-                                        <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-100">
-                                            <h4 className="font-bold text-blue-900 text-sm mb-1">Insider Tip</h4>
-                                            <p className="text-blue-800 text-sm">{countryData.insiderTip}</p>
+                                        <div className="mt-8 bg-blue-50/80 backdrop-blur-sm p-6 rounded-xl border border-blue-100">
+                                            <h4 className="font-bold text-blue-900 text-sm mb-2 uppercase tracking-wide">Insider Tip</h4>
+                                            <p className="text-blue-800 text-sm leading-relaxed">{countryData.insiderTip}</p>
                                         </div>
                                     </div>
                                 )}
@@ -1052,8 +1013,8 @@
                                 {activeTab === 'specializations' && (
                                     <div className="animate-fade-in">
                                         <div className="text-center mb-10">
-                                            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Global HR Certifications Library</h2>
-                                            <p className="text-gray-600 max-w-2xl mx-auto">
+                                            <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Global HR Certifications Library</h2>
+                                            <p className="text-slate-600 max-w-2xl mx-auto">
                                                 Explore the best HR certifications around the world. Choose your category and country to find the credentials that match your career goals.
                                             </p>
                                         </div>
@@ -1067,20 +1028,20 @@
 
                                                 return (
                                                     <div key={cIdx}>
-                                                        <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2">{category.title}</h3>
+                                                        <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">{category.title}</h3>
                                                         <div className="grid gap-6">
                                                             {filteredRegions.map((region, rIdx) => (
-                                                                <div key={rIdx} className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                                                                    <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                                                <div key={rIdx} className="bg-white/60 rounded-xl p-6 border border-white/60 shadow-sm">
+                                                                    <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                                                                         <span className="text-2xl">{region.flag}</span> {region.country}
                                                                     </h4>
                                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                                         {region.certs.map((cert, ctIdx) => (
-                                                                            <div key={ctIdx} className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition hover:scale-[1.02] border border-gray-100">
-                                                                                <h5 className="font-bold text-gray-800">{cert.name}</h5>
-                                                                                <p className="text-sm text-gray-600 mb-3">{cert.desc}</p>
-                                                                                <button className="text-blue-600 text-xs font-bold bg-blue-50 px-3 py-1.5 rounded hover:bg-blue-100 transition">Learn More</button>
-                                                                            </div>
+                                                                            <TiltCard key={ctIdx} className="glass-card p-5 rounded-lg">
+                                                                                <h5 className="font-bold text-slate-800">{cert.name}</h5>
+                                                                                <p className="text-sm text-slate-600 mb-4 mt-1">{cert.desc}</p>
+                                                                                <button className="text-indigo-600 text-xs font-bold bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition">Learn More</button>
+                                                                            </TiltCard>
                                                                         ))}
                                                                     </div>
                                                                 </div>
@@ -1096,7 +1057,7 @@
                                 {/* Resources Tab */}
                                 {activeTab === 'resources' && (
                                     <div className="animate-fade-in space-y-8">
-                                        <div className="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-r-lg shadow-sm">
+                                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-600 p-6 rounded-r-xl shadow-sm">
                                             <h3 className="text-xl font-bold text-blue-900 mb-2">Education First</h3>
                                             <p className="text-blue-800 text-sm leading-relaxed">
                                                 Before diving into certifications, the first step to becoming a great HR professional is a solid academic foundation. 
@@ -1107,22 +1068,22 @@
                                         <div className="space-y-8">
                                             {countryData.resources?.sections?.map((section, sIdx) => (
                                                 <div key={sIdx}>
-                                                    <h3 className="text-lg font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2 flex items-center gap-2">
-                                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded uppercase">{section.category}</span>
+                                                    <h3 className="text-lg font-bold text-slate-800 mb-4 border-b border-slate-200 pb-2 flex items-center gap-2">
+                                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded uppercase tracking-wide font-bold">{section.category}</span>
                                                     </h3>
                                                     <div className="grid gap-4 sm:grid-cols-2">
                                                         {section.schools.map((school, idx) => (
-                                                            <div key={idx} className="bg-white rounded-lg p-5 border border-gray-200 hover:shadow-md transition">
-                                                                <h4 className="font-bold text-gray-900 text-lg mb-3">{school.name}</h4>
+                                                            <TiltCard key={idx} className="glass-card rounded-xl p-6">
+                                                                <h4 className="font-bold text-slate-900 text-lg mb-3">{school.name}</h4>
                                                                 <div className="space-y-2">
                                                                     {school.programs.map((prog, pIdx) => (
                                                                         <div key={pIdx} className="flex items-start gap-2">
-                                                                            <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></div>
-                                                                            <p className="text-sm text-gray-600 leading-snug">{prog}</p>
+                                                                            <div className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0"></div>
+                                                                            <p className="text-sm text-slate-600 leading-snug">{prog}</p>
                                                                         </div>
                                                                     ))}
                                                                 </div>
-                                                            </div>
+                                                            </TiltCard>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -1134,25 +1095,25 @@
                                 {/* Legal & Compliance Tab */}
                                 {activeTab === 'legal' && (
                                     <div className="animate-fade-in space-y-8">
-                                        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                            <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                                <Scale className="h-6 w-6 text-gray-700" /> Legal Framework in {countryData.name}
+                                        <div className="glass-card p-8 rounded-2xl">
+                                            <h3 className="text-2xl font-bold text-slate-900 mb-4 flex items-center gap-3">
+                                                <Scale className="h-7 w-7 text-slate-700" /> Legal Framework in {countryData.name}
                                             </h3>
-                                            <p className="text-gray-600 text-sm leading-relaxed mb-6">{countryData.compliance?.intro}</p>
+                                            <p className="text-slate-600 text-base leading-relaxed mb-8">{countryData.compliance?.intro}</p>
                                             
-                                            <div className="space-y-8">
+                                            <div className="space-y-10">
                                                 {countryData.compliance?.sections?.map((section, sIdx) => (
                                                     <div key={sIdx}>
-                                                        <h4 className="text-lg font-bold text-blue-900 mb-4 pb-2 border-b border-blue-100">{section.title}</h4>
+                                                        <h4 className="text-lg font-bold text-blue-900 mb-5 pb-2 border-b border-blue-100/50">{section.title}</h4>
                                                         <div className="grid gap-4 sm:grid-cols-2">
                                                             {section.items.map((item, iIdx) => (
-                                                                <div key={iIdx} className="bg-white p-4 rounded border border-gray-100 shadow-sm hover:border-blue-200 transition">
-                                                                    <div className="flex justify-between items-start">
-                                                                        <h5 className="font-bold text-gray-800 text-sm">{item.name}</h5>
-                                                                        <FileText className="h-4 w-4 text-gray-300" />
+                                                                <TiltCard key={iIdx} className="bg-white/60 p-5 rounded-xl border border-white/60 shadow-sm">
+                                                                    <div className="flex justify-between items-start mb-2">
+                                                                        <h5 className="font-bold text-slate-800 text-sm">{item.name}</h5>
+                                                                        <FileText className="h-4 w-4 text-slate-400" />
                                                                     </div>
-                                                                    <p className="text-xs text-gray-500 mt-1 leading-snug">{item.desc}</p>
-                                                                </div>
+                                                                    <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                                                                </TiltCard>
                                                             ))}
                                                         </div>
                                                     </div>
@@ -1165,23 +1126,23 @@
                                 {/* Brains / Big Ideas Tab */}
                                 {activeTab === 'brains' && (
                                     <div className="animate-fade-in">
-                                        <div className="text-center mb-10">
-                                            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Brains Behind HR</h2>
-                                            <p className="text-gray-600 max-w-2xl mx-auto">
-                                                HR isn’t just forms and policies. Behind every decision, there are powerful ideas from economics and psychology. Tap a card to see how each theory turns into a real HR superpower.
+                                        <div className="text-center mb-12">
+                                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Brains Behind HR</h2>
+                                            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+                                                HR isn’t just forms and policies. Behind every decision, there are powerful ideas from economics and psychology.
                                             </p>
                                         </div>
 
-                                        <div className="flex justify-center mb-8 gap-4">
+                                        <div className="flex justify-center mb-10 gap-4">
                                             <button 
                                                 onClick={() => setBrainsTab("economics")}
-                                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${brainsTab === "economics" ? "bg-blue-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}
+                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${brainsTab === "economics" ? "bg-slate-800 text-white shadow-lg ring-2 ring-slate-800 ring-offset-2" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}
                                             >
                                                 Economic Ideas Shaping HR
                                             </button>
                                             <button 
                                                 onClick={() => setBrainsTab("psychology")}
-                                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${brainsTab === "psychology" ? "bg-purple-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}
+                                                className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${brainsTab === "psychology" ? "bg-purple-600 text-white shadow-lg ring-2 ring-purple-600 ring-offset-2" : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"}`}
                                             >
                                                 Psychology Ideas for People & Culture
                                             </button>
@@ -1189,16 +1150,16 @@
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                             {brainsData[brainsTab].map((item, idx) => (
-                                                <div key={idx} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 border border-gray-100 group hover:border-blue-200">
-                                                    <div className="text-3xl mb-4 bg-gray-50 w-12 h-12 flex items-center justify-center rounded-lg group-hover:bg-blue-50 transition-colors">{item.icon}</div>
-                                                    <h3 className="text-lg font-bold text-gray-900 mb-1">{item.title}</h3>
-                                                    <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-3">{item.label}</p>
-                                                    <p className="text-sm text-gray-600 mb-4 italic">"{item.oneLine}"</p>
-                                                    <div className="pt-4 border-t border-gray-100">
-                                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">In HR, this means:</p>
-                                                        <p className="text-sm text-gray-700 leading-snug">{item.hrMeaning}</p>
+                                                <TiltCard key={idx} className="glass-card rounded-2xl p-6 group">
+                                                    <div className="text-4xl mb-4 bg-white w-14 h-14 flex items-center justify-center rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+                                                    <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
+                                                    <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-4">{item.label}</p>
+                                                    <p className="text-sm text-slate-600 mb-5 italic bg-slate-50 p-3 rounded-lg border border-slate-100">"{item.oneLine}"</p>
+                                                    <div className="pt-4 border-t border-slate-100">
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-widest">In HR, this means:</p>
+                                                        <p className="text-sm text-slate-700 leading-relaxed">{item.hrMeaning}</p>
                                                     </div>
-                                                </div>
+                                                </TiltCard>
                                             ))}
                                         </div>
                                     </div>
@@ -1207,38 +1168,37 @@
                                 {/* Bookshelf Tab */}
                                 {activeTab === 'books' && (
                                     <div className="animate-fade-in">
-                                        <div className="text-center mb-10">
-                                            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">Foundational HR Books</h2>
-                                            <p className="text-gray-600 max-w-2xl mx-auto">
+                                        <div className="text-center mb-12">
+                                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Foundational HR Books</h2>
+                                            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
                                                 A curated bookshelf for HR students and professionals. Start with the basics, grow into strategy, and one day sit at the CHRO table.
                                             </p>
-                                            <p className="text-sm text-blue-600 mt-2">📚 Start anywhere. Each book nudges you one step closer to CHRO.</p>
+                                            <p className="text-sm text-indigo-600 mt-4 font-medium bg-indigo-50 inline-block px-4 py-2 rounded-full">📚 Start anywhere. Each book nudges you one step closer to CHRO.</p>
                                         </div>
 
-                                        <div className="space-y-12">
+                                        <div className="space-y-14">
                                             {booksData.categories.map((cat, cIdx) => (
                                                 <div key={cIdx}>
-                                                    <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2">{cat.title}</h3>
+                                                    <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2">{cat.title}</h3>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {cat.books.map((book, bIdx) => (
-                                                            <div key={bIdx} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1 group">
-                                                                <div className="p-5">
-                                                                    <h4 className="font-bold text-gray-900 text-lg mb-1">{book.title}</h4>
-                                                                    <p className="text-sm text-gray-500 italic mb-4">by {book.author}</p>
+                                                            <TiltCard key={bIdx} className="glass-card rounded-xl group flex flex-col h-full">
+                                                                <div className="p-6 flex-1">
+                                                                    <h4 className="font-bold text-slate-900 text-lg mb-1">{book.title}</h4>
+                                                                    <p className="text-sm text-slate-500 italic mb-5">by {book.author}</p>
                                                                     
-                                                                    <div className="mb-4">
-                                                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">What it's about:</p>
-                                                                        <p className="text-sm text-gray-700 leading-snug">{book.about}</p>
-                                                                    </div>
-                                                                    
-                                                                    <div className="pt-3 border-t border-gray-50 bg-blue-50/30 -mx-5 -mb-5 p-5">
-                                                                        <p className="text-xs font-bold text-blue-600 uppercase mb-1 flex items-center gap-1">
-                                                                            <span className="text-lg">💡</span> Why read it:
-                                                                        </p>
-                                                                        <p className="text-sm text-blue-900 leading-snug">{book.why}</p>
+                                                                    <div className="mb-6">
+                                                                        <p className="text-[10px] font-bold text-slate-400 uppercase mb-1 tracking-wide">What it's about:</p>
+                                                                        <p className="text-sm text-slate-700 leading-relaxed">{book.about}</p>
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                                <div className="bg-blue-50/50 p-5 border-t border-blue-100/50 rounded-b-xl mt-auto">
+                                                                    <p className="text-[10px] font-bold text-blue-600 uppercase mb-1 flex items-center gap-1">
+                                                                        <span className="text-base">💡</span> Why read it:
+                                                                    </p>
+                                                                    <p className="text-sm text-blue-900 leading-snug">{book.why}</p>
+                                                                </div>
+                                                            </TiltCard>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -1250,37 +1210,37 @@
                                 {/* Community Tab */}
                                 {activeTab === 'community' && (
                                     <div className="animate-fade-in">
-                                        <div className="text-center mb-10">
-                                            <h2 className="text-3xl font-extrabold text-gray-900 mb-3">HR Associations & Communities</h2>
-                                            <p className="text-gray-600 max-w-2xl mx-auto">
-                                                Join the best HR organizations around the world. Build your network, learn from experts, attend events, and grow your HR career locally or globally.
+                                        <div className="text-center mb-12">
+                                            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">HR Associations & Communities</h2>
+                                            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+                                                Join the best HR organizations around the world. Build your network, learn from experts, attend events, and grow your HR career.
                                             </p>
-                                            <p className="text-sm text-blue-600 mt-2">Find your HR tribe. Join communities that elevate your career.</p>
+                                            <p className="text-sm text-blue-600 mt-4 font-medium">Find your HR tribe.</p>
                                         </div>
 
                                         <div className="space-y-12">
                                             {/* Global Section */}
                                             <div>
-                                                <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2 flex items-center gap-2">
+                                                <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2 flex items-center gap-2">
                                                     <span className="text-2xl">🌐</span> Global HR Associations
                                                 </h3>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                     {associationsData.global.map((assoc, idx) => (
-                                                        <div key={idx} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:scale-[1.02] hover:border-blue-200">
+                                                        <TiltCard key={idx} className="glass-card rounded-xl p-6 border-l-4 border-l-blue-500">
                                                             <div className="flex justify-between items-start mb-3">
-                                                                <h4 className="font-bold text-gray-900 text-lg">{assoc.name}</h4>
+                                                                <h4 className="font-bold text-slate-900 text-lg">{assoc.name}</h4>
                                                                 <div className="flex gap-1">
                                                                     {assoc.tags.map((tag, tIdx) => (
                                                                         <span key={tIdx} className="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-full font-medium uppercase tracking-wide border border-blue-100">{tag}</span>
                                                                     ))}
                                                                 </div>
                                                             </div>
-                                                            <p className="text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide">{assoc.fullName}</p>
-                                                            <p className="text-sm text-gray-600 mb-6 leading-relaxed">{assoc.desc}</p>
-                                                            <button className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1">
-                                                                Visit Website <ArrowRight className="w-3 h-3" />
+                                                            <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wide">{assoc.fullName}</p>
+                                                            <p className="text-sm text-slate-600 mb-6 leading-relaxed">{assoc.desc}</p>
+                                                            <button className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1 group">
+                                                                Visit Website <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                                             </button>
-                                                        </div>
+                                                        </TiltCard>
                                                     ))}
                                                 </div>
                                             </div>
@@ -1296,26 +1256,26 @@
                                             .filter(region => region.country === selectedCountry) // Only show selected country
                                             .map((region) => (
                                                 <div key={region.key}>
-                                                    <h3 className="text-xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-2 flex items-center gap-2">
+                                                    <h3 className="text-xl font-bold text-slate-800 mb-6 border-b border-slate-200 pb-2 flex items-center gap-2">
                                                         <span className="text-2xl">{region.icon}</span> {region.title}
                                                     </h3>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                                         {associationsData[region.key].map((assoc, idx) => (
-                                                            <div key={idx} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 border border-gray-100 hover:scale-[1.02] hover:border-blue-200">
+                                                            <TiltCard key={idx} className="glass-card rounded-xl p-6">
                                                                 <div className="flex justify-between items-start mb-3">
-                                                                    <h4 className="font-bold text-gray-900 text-lg">{assoc.name}</h4>
+                                                                    <h4 className="font-bold text-slate-900 text-lg">{assoc.name}</h4>
                                                                     <div className="flex gap-1 flex-wrap justify-end">
                                                                         {assoc.tags.map((tag, tIdx) => (
-                                                                            <span key={tIdx} className="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-full font-medium border border-gray-200">{tag}</span>
+                                                                            <span key={tIdx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full font-medium border border-slate-200">{tag}</span>
                                                                         ))}
                                                                     </div>
                                                                 </div>
-                                                                <p className="text-xs text-gray-500 font-medium mb-2 uppercase tracking-wide">{assoc.fullName}</p>
-                                                                <p className="text-sm text-gray-600 mb-6 leading-relaxed">{assoc.desc}</p>
-                                                                <button className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1">
-                                                                    Visit Website <ArrowRight className="w-3 h-3" />
+                                                                <p className="text-xs text-slate-500 font-medium mb-3 uppercase tracking-wide">{assoc.fullName}</p>
+                                                                <p className="text-sm text-slate-600 mb-6 leading-relaxed">{assoc.desc}</p>
+                                                                <button className="text-blue-600 font-bold text-sm hover:underline flex items-center gap-1 group">
+                                                                    Visit Website <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                                                 </button>
-                                                            </div>
+                                                            </TiltCard>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -1327,18 +1287,19 @@
                                 {/* Timeline Tab */}
                                 {activeTab === 'timeline' && (
                                     <div className="animate-fade-in">
-                                        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 mb-6">
-                                            <h3 className="font-bold text-gray-900 mb-4">My Journey</h3>
-                                            <form onSubmit={handleAddStep} className="flex gap-2 mb-6">
-                                                <input type="text" placeholder="Add step..." className="flex-1 p-2 border rounded text-sm" value={newStepName} onChange={(e) => setNewStepName(e.target.value)} />
-                                                <button type="submit" className="bg-blue-600 text-white px-4 rounded text-sm font-bold">Add</button>
+                                        <div className="glass-card p-8 rounded-2xl">
+                                            <h3 className="font-bold text-slate-900 mb-6 text-xl">My Journey</h3>
+                                            <form onSubmit={handleAddStep} className="flex gap-3 mb-8">
+                                                <input type="text" placeholder="Add a milestone (e.g. Passed SHRM-CP)..." className="flex-1 p-3 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white/80" value={newStepName} onChange={(e) => setNewStepName(e.target.value)} />
+                                                <button type="submit" className="bg-slate-800 text-white px-6 py-3 rounded-lg text-sm font-bold hover:bg-slate-900 transition">Add</button>
                                             </form>
-                                            <div className="space-y-4">
-                                                {myTimeline.length === 0 && <p className="text-sm text-gray-400 italic">Start planning your certification path above.</p>}
+                                            <div className="space-y-4 relative pl-8 border-l-2 border-slate-200 ml-4">
+                                                {myTimeline.length === 0 && <p className="text-sm text-slate-400 italic pl-2">Start planning your certification path above.</p>}
                                                 {myTimeline.map(t => (
-                                                    <div key={t.id} className="bg-white p-3 rounded border border-gray-200 shadow-sm">
-                                                        <p className="font-bold text-sm">{t.name}</p>
-                                                        <p className="text-xs text-gray-500">{t.date}</p>
+                                                    <div key={t.id} className="bg-white/80 p-4 rounded-xl border border-white shadow-sm relative">
+                                                        <div className="absolute -left-[41px] top-5 w-4 h-4 rounded-full bg-blue-500 border-4 border-white shadow-sm"></div>
+                                                        <p className="font-bold text-sm text-slate-800">{t.name}</p>
+                                                        <p className="text-xs text-slate-500 mt-1">{t.date}</p>
                                                     </div>
                                                 ))}
                                             </div>
@@ -1349,19 +1310,33 @@
                                 {/* Compare Tab */}
                                 {activeTab === 'compare' && (
                                     <div className="animate-fade-in">
-                                        <div className="flex justify-between items-center mb-6">
-                                            <h3 className="font-bold text-gray-900">Comparing {countryData.name} vs.</h3>
-                                            <select className="border rounded p-2 font-bold" value={compareCountry} onChange={(e) => setCompareCountry(e.target.value)}>
-                                                {Object.keys(certificationData).filter(k => k !== selectedCountry).map(k => <option key={k} value={k}>{certificationData[k].name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div className="grid grid-cols-2 border rounded overflow-hidden">
-                                            <div className="p-4 bg-gray-50 border-b border-r font-bold text-center">{countryData.name}</div>
-                                            <div className="p-4 bg-gray-50 border-b font-bold text-center">{comparisonData.name}</div>
-                                            <div className="p-4 border-b border-r text-sm text-center"><span className="block text-xs text-gray-400 uppercase">Avg Salary</span>{countryData.avgSalary}</div>
-                                            <div className="p-4 border-b text-sm text-center"><span className="block text-xs text-gray-400 uppercase">Avg Salary</span>{comparisonData.avgSalary}</div>
-                                            <div className="p-4 border-r text-sm text-center"><span className="block text-xs text-gray-400 uppercase">Legal System</span>{countryData.legalSystem}</div>
-                                            <div className="p-4 text-sm text-center"><span className="block text-xs text-gray-400 uppercase">Legal System</span>{comparisonData.legalSystem}</div>
+                                        <div className="glass-card p-8 rounded-2xl">
+                                            <div className="flex justify-between items-center mb-8">
+                                                <h3 className="font-bold text-xl text-slate-900">Comparing {countryData.name} vs.</h3>
+                                                <select className="bg-white/80 border border-slate-200 rounded-lg p-2.5 font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none" value={compareCountry} onChange={(e) => setCompareCountry(e.target.value)}>
+                                                    {Object.keys(certificationData).filter(k => k !== selectedCountry).map(k => <option key={k} value={k}>{certificationData[k].name}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="grid grid-cols-2 border border-slate-200 rounded-xl overflow-hidden">
+                                                <div className="p-6 bg-slate-50/80 border-b border-r border-slate-200 font-bold text-center text-lg">{countryData.name}</div>
+                                                <div className="p-6 bg-slate-50/80 border-b border-slate-200 font-bold text-center text-lg">{comparisonData.name}</div>
+                                                <div className="p-6 border-b border-r border-slate-200 text-center bg-white/60">
+                                                    <span className="block text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Avg Salary</span>
+                                                    <span className="text-xl font-bold text-slate-800">{countryData.avgSalary}</span>
+                                                </div>
+                                                <div className="p-6 border-b border-slate-200 text-center bg-white/60">
+                                                    <span className="block text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Avg Salary</span>
+                                                    <span className="text-xl font-bold text-slate-800">{comparisonData.avgSalary}</span>
+                                                </div>
+                                                <div className="p-6 border-r border-slate-200 text-center bg-white/60">
+                                                    <span className="block text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Legal System</span>
+                                                    <span className="text-sm font-medium text-slate-700">{countryData.legalSystem}</span>
+                                                </div>
+                                                <div className="p-6 text-center bg-white/60">
+                                                    <span className="block text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Legal System</span>
+                                                    <span className="text-sm font-medium text-slate-700">{comparisonData.legalSystem}</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -1376,6 +1351,4 @@
         root.render(<App />);
     </script>
 </body>
-
 </html>
-
