@@ -858,7 +858,7 @@
         const App = () => {
             const [showIntro, setShowIntro] = useState(true);
             const [selectedCountry, setSelectedCountry] = useState('USA');
-            const [activeTab, setActiveTab] = useState('overview'); 
+            const [activeTab, setActiveTab] = useState('specializations'); 
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [compareCountry, setCompareCountry] = useState('UK');
             const [expandedCard, setExpandedCard] = useState(null); 
@@ -908,13 +908,13 @@
                     <nav className="bg-white/80 backdrop-blur-md text-gray-800 sticky top-0 z-50 border-b border-white/40">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex items-center justify-between h-16">
-                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('overview')}>
+                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('specializations')}>
                                     <div className="bg-gradient-to-r from-slate-800 to-slate-900 p-1.5 rounded-lg shadow-md"><GlobeIcon className="h-6 w-6 text-white" /></div>
                                     <span className="font-bold text-xl tracking-tight text-slate-900">GlobalHRCreds</span>
                                 </div>
                                 <div className="hidden md:block">
                                     <div className="ml-10 flex items-baseline space-x-6">
-                                        {['overview', 'specializations', 'timeline', 'resources', 'legal', 'compare', 'brains', 'books', 'community'].map(tab => (
+                                        {['specializations', 'timeline', 'resources', 'legal', 'compare', 'brains', 'books', 'community'].map(tab => (
                                             <button 
                                                 key={tab}
                                                 onClick={() => setActiveTab(tab)} 
@@ -935,7 +935,7 @@
                         </div>
                         {mobileMenuOpen && (
                             <div className="md:hidden bg-white border-t border-gray-100 px-2 py-2 space-y-1 shadow-lg">
-                                {['overview', 'specializations', 'timeline', 'resources', 'legal', 'compare', 'brains', 'books', 'community'].map(tab => (
+                                {['specializations', 'timeline', 'resources', 'legal', 'compare', 'brains', 'books', 'community'].map(tab => (
                                     <button key={tab} onClick={() => {setActiveTab(tab); setMobileMenuOpen(false)}} className="block px-3 py-3 text-base font-medium text-gray-700 w-full text-left capitalize">{tab === 'resources' ? 'Top Schools' : tab === 'brains' ? 'Big Ideas' : tab === 'books' ? 'Bookshelf' : tab === 'community' ? 'Community' : tab}</button>
                                 ))}
                             </div>
@@ -966,7 +966,6 @@
                                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 px-3">Menu</h3>
                                 <div className="space-y-1">
                                     {[
-                                        { id: 'overview', icon: Award, label: 'Overview' },
                                         { id: 'specializations', icon: Briefcase, label: 'Specializations' },
                                         { id: 'timeline', icon: Clock, label: 'Timeline Tracker' },
                                         { id: 'resources', icon: GraduationCap, label: 'Top Schools' },
@@ -992,28 +991,6 @@
                                         <p className="text-slate-500 mt-2 text-sm font-medium">Managed by: <span className="font-bold text-slate-700">{countryData.authority}</span></p>
                                     </div>
                                 </div>
-
-                                {/* Overview Tab */}
-                                {activeTab === 'overview' && (
-                                    <div className="animate-fade-in">
-                                        <p className="text-slate-600 leading-relaxed mb-10 text-lg">{countryData.description}</p>
-                                        <h3 className="text-xl font-bold text-slate-900 mb-6">Top Credentials</h3>
-                                        <div className="grid gap-6 md:grid-cols-2">
-                                            {countryData.topCerts.map((cert, idx) => (
-                                                <TiltCard key={idx} className="glass-card rounded-xl p-6 relative group">
-                                                    <div className="absolute top-0 right-0 bg-gray-900 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl rounded-tr-xl shadow-sm">{cert.acronym}</div>
-                                                    <h4 className="font-bold text-slate-900 mt-2 text-lg">{cert.fullName}</h4>
-                                                    <p className="text-sm text-slate-600 mt-2">{cert.focus}</p>
-                                                    <p className="text-xs font-bold text-gray-900 mt-4 bg-gray-100 inline-block px-3 py-1 rounded-full">Cost: {cert.cost}</p>
-                                                </TiltCard>
-                                            ))}
-                                        </div>
-                                        <div className="mt-8 bg-gray-100/80 backdrop-blur-sm p-6 rounded-xl border border-gray-200">
-                                            <h4 className="font-bold text-gray-900 text-sm mb-2 uppercase tracking-wide">Insider Tip</h4>
-                                            <p className="text-gray-700 text-sm leading-relaxed">{countryData.insiderTip}</p>
-                                        </div>
-                                    </div>
-                                )}
 
                                 {/* Specializations Tab */}
                                 {activeTab === 'specializations' && (
