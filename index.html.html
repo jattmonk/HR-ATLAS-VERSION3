@@ -854,11 +854,37 @@
             ]
         };
 
+        // --- Brains / Theories Data ---
+        const brainsData = {
+            economics: [
+                { icon: "🧠", title: "Behavioral Economics", label: "Why people act irrational at work", oneLine: "People are not rational robots – they make weird, biased decisions.", hrMeaning: "Don’t design policies assuming people will ‘do the logical thing’. You design performance reviews, benefits, and incentives knowing that framing, fairness, loss-aversion and bias heavily influence behaviour." },
+                { icon: "📈", title: "Human Capital Theory", label: "Learning as an investment", oneLine: "Education, skills, experience = economic assets, not just ‘costs’.", hrMeaning: "Training, upskilling, coaching, and development aren’t just ‘nice to have’ — they are literally investments with a return." },
+                { icon: "📜", title: "Contract Theory", label: "Incentives and behaviour", oneLine: "How you pay people shapes how they behave.", hrMeaning: "Bonus plans, commissions and executive compensation must be designed so people don’t game the system but move the company in the right direction." },
+                { icon: "🧩", title: "Matching Theory", label: "Right person, right job", oneLine: "Hiring is a matching game: right worker + right job = value.", hrMeaning: "Great recruiting is about matching skills, motivations and culture with the right job, not just filling vacancies." },
+                { icon: "♟️", title: "Game Theory", label: "Thinking in moves and countermoves", oneLine: "People make choices based on what they think others will do.", hrMeaning: "Use it for salary negotiations, union bargaining and change management: if you push here, what counter-move will employees or unions make?" },
+                { icon: "⚙️", title: "Mechanism Design", label: "Design the rules so good behaviour is easy", oneLine: "Design the system so the best behaviour is also the easiest behaviour.", hrMeaning: "Policies, recognition and promotion rules should naturally nudge people toward collaboration, ethics and performance." }
+            ],
+            psychology: [
+                { icon: "🔺", title: "Maslow’s Hierarchy of Needs", label: "From paycheque to purpose", oneLine: "People climb from basic needs (salary, safety) to higher needs (belonging, esteem, purpose).", hrMeaning: "You can’t fix engagement with ‘purpose workshops’ if people don’t feel safe, respected or fairly paid." },
+                { icon: "⚖️", title: "Herzberg’s Two-Factor Theory", label: "What stops pain vs what creates joy", oneLine: "Some things stop people from hating their job (hygiene), others make them love it (motivators).", hrMeaning: "Salary and policies prevent dissatisfaction; growth, recognition and meaningful work create real motivation." },
+                { icon: "🌟", title: "Self-Determination Theory", label: "Autonomy, competence, connection", oneLine: "Humans are happiest when they feel autonomy, competence and relatedness.", hrMeaning: "Micromanagement kills motivation. Design jobs with ownership, chances to get better and real relationships." },
+                { icon: "🏆", title: "McClelland’s Needs Theory", label: "Achievement, power, belonging", oneLine: "People are driven by different mixes of three needs: to achieve, to belong and to influence.", hrMeaning: "Use it in hiring and leadership development – some roles need high achievement, others need affiliation or power." },
+                { icon: "🖐️", title: "Big Five Personality Traits", label: "Five dimensions of personality", oneLine: "Personality can be seen as Openness, Conscientiousness, Extraversion, Agreeableness and Neuroticism.", hrMeaning: "Helps with role fit, team-building and coaching (used carefully, not to stereotype people)." },
+                { icon: "🔄", title: "Tuckman’s Team Stages", label: "Forming, storming, norming, performing", oneLine: "Teams often go through predictable stages before they perform well.", hrMeaning: "Conflict in a new team isn’t always a red flag – it can be a normal stage that leaders can guide through." },
+                { icon: "🛡️", title: "Psychological Safety", label: "Safe to speak up", oneLine: "People do their best work when they feel safe to speak up, admit mistakes and share ideas.", hrMeaning: "Policies and leaders should reward speaking up, not punish it. It’s the foundation of learning and innovation." },
+                { icon: "⚖️", title: "Equity Theory", label: "It’s not just pay – it’s fairness", oneLine: "People compare their effort and rewards with others and care deeply about fairness.", hrMeaning: "Internal equity, fair processes and transparent logic are as important as the salary number itself." },
+                { icon: "🎯", title: "Expectancy Theory", label: "Will my effort actually matter?", oneLine: "People are motivated when they believe effort → performance → reward, and the reward is worth it.", hrMeaning: "Performance and reward systems must be clear, believable and meaningful – or motivation disappears." },
+                { icon: "🎭", title: "Cognitive Dissonance", label: "When words and reality clash", oneLine: "When actions and beliefs don’t match, people feel psychological tension.", hrMeaning: "If the company says ‘we value work-life balance’ but rewards only long hours, employees lose trust and engagement." },
+                { icon: "📉", title: "Prospect Theory", label: "Losses hurt more than gains feel good", oneLine: "People are more sensitive to losses than to equivalent gains.", hrMeaning: "Cutting benefits hurts more than adding similar benefits helps. Be careful how you frame changes." },
+                { icon: "🚫", title: "Cognitive Biases in HR", label: "Brain shortcuts that cause unfairness", oneLine: "Our brains use shortcuts like halo effect, anchoring and confirmation bias.", hrMeaning: "Use structured interviews, clear criteria and data to reduce bias in hiring, performance ratings and promotions." }
+            ]
+        };
+
         // --- Main App ---
         const App = () => {
             const [showIntro, setShowIntro] = useState(true);
             const [selectedCountry, setSelectedCountry] = useState('USA');
-            const [activeTab, setActiveTab] = useState('specializations'); 
+            const [activeTab, setActiveTab] = useState('specializations'); // DEFAULT TAB IS NOW SPECIALIZATIONS
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [compareCountry, setCompareCountry] = useState('UK');
             const [expandedCard, setExpandedCard] = useState(null); 
@@ -992,7 +1018,7 @@
                                     </div>
                                 </div>
 
-                                {/* Specializations Tab */}
+                                {/* Specializations Tab (NOW DEFAULT) */}
                                 {activeTab === 'specializations' && (
                                     <div className="animate-fade-in">
                                         <div className="text-center mb-10">
