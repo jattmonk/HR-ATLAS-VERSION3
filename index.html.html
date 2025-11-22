@@ -287,9 +287,9 @@
             };
 
             return (
-                <div 
+                <div
                     ref={cardRef}
-                    className={`transition-transform duration-200 ease-out ${className}`} 
+                    className={`transition-transform duration-200 ease-out ${className}`}
                     onMouseMove={handleMouseMove}
                     onMouseLeave={handleMouseLeave}
                 >
@@ -297,6 +297,25 @@
                 </div>
             );
         };
+
+        // --- Reusable Modal ---
+        const Modal = ({ title, onClose, children }) => (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="absolute inset-0 bg-black/60" onClick={onClose}></div>
+                <div className="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full p-6 md:p-8 overflow-y-auto max-h-[85vh] border border-gray-100">
+                    <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Detail view</p>
+                            <h3 className="text-2xl font-extrabold text-slate-900 leading-tight">{title}</h3>
+                        </div>
+                        <button onClick={onClose} className="text-slate-500 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition" aria-label="Close dialog">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    {children}
+                </div>
+            </div>
+        );
 
         // --- Intro Component ---
         const IntroScreen = ({ onComplete }) => {
@@ -548,6 +567,107 @@
                 ]
             }
         ];
+
+        // --- Exam Experience & Passing Tips by Country ---
+        const examExperienceByCountry = {
+            USA: {
+                intro: "What exam takers say about US HR credentials and how they pass.",
+                exams: [
+                    {
+                        name: "SHRM-CP / SHRM-SCP",
+                        feel: "Scenario-heavy situational judgement questions that test how you would respond as an HRBP rather than what you have memorized.",
+                        tips: [
+                            "Budget 8-12 weeks with 1-2 hour study blocks using the SHRM Learning System or chapter study groups.",
+                            "Drill behaviour-based practice questions and pay attention to ‘most/least effective’ wording to avoid traps.",
+                            "Review US federal laws at a high level (FMLA, FLSA, Title VII) and how to apply them in realistic situations."
+                        ]
+                    },
+                    {
+                        name: "PHR / SPHR (HRCI)",
+                        feel: "More compliance and calculation oriented than SHRM, with a focus on risk mitigation and employment law detail.",
+                        tips: [
+                            "Use timed practice exams to build speed on math-style items (turnover, yield ratios, comp).",
+                            "Anchor answers in legally defensible steps first, then efficiency or culture considerations second.",
+                            "Create a one-pager of federal thresholds (exempt vs non-exempt, notice periods, record retention)."
+                        ]
+                    }
+                ]
+            },
+            Canada: {
+                intro: "How Canadian candidates describe the NKE/CHRL journey and what helps them succeed.",
+                exams: [
+                    {
+                        name: "CPHR National Knowledge Exam (NKE)",
+                        feel: "Multiple-choice questions that mirror textbook HRM content with Canadian employment standards woven in.",
+                        tips: [
+                            "Study the nine CPHR functional areas; pair the Competency Framework with provincial employment standards notes.",
+                            "Do timed mock exams to manage a long test window and reduce over-thinking on straightforward items.",
+                            "Keep flashcards for minimums (vacation, overtime, stat holidays) by province to avoid mixing jurisdictions."
+                        ]
+                    },
+                    {
+                        name: "Ontario HRPA CHRL/CHRP Exams",
+                        feel: "Application-heavy scenarios that expect you to cite ESA rules, health & safety, and human rights obligations.",
+                        tips: [
+                            "Use the HRPA prep guides plus ESA/OSHA checklists so you can spot the mandatory first response in each scenario.",
+                            "Practice writing short rationales: why an action is compliant, fair, and business-aligned.",
+                            "Join local HRPA chapter study circles to trade sample cases and marking schemes."
+                        ]
+                    }
+                ]
+            },
+            UK: {
+                intro: "Typical learner feedback from CIPD candidates and the habits that get them through assessments.",
+                exams: [
+                    {
+                        name: "CIPD Level 5 / Level 7",
+                        feel: "Assignment and portfolio driven rather than one-off exams, with strong emphasis on evidence, reflection, and linking to CIPD Profession Map behaviours.",
+                        tips: [
+                            "Start each assignment with a clear structure (context, analysis, options, recommendation, references).",
+                            "Reference UK employment statutes (ERA 1996, Equality Act 2010) to ground your arguments in compliance.",
+                            "Collect workplace evidence early (policies, meeting notes, metrics) so portfolios are not rushed at deadline week."
+                        ]
+                    }
+                ]
+            },
+            Australia: {
+                intro: "Insights from AHRI certification candidates on what the assessment feels like and how they prepare.",
+                exams: [
+                    {
+                        name: "AHRI Certified Practitioner (CPHR)",
+                        feel: "Workplace evidence submission plus an interview that probes how you applied the AHRI Model of Excellence in real situations.",
+                        tips: [
+                            "Map each piece of evidence to a specific Model of Excellence capability and include measurable outcomes.",
+                            "Rehearse STAR stories focused on Awards, NES, and Fair Work compliance to handle panel questions confidently.",
+                            "Request supervisor feedback letters early; missing documentation is the top reason for delays."
+                        ]
+                    }
+                ]
+            },
+            India: {
+                intro: "What Indian HR professionals report about global exams taken locally and how they pass them.",
+                exams: [
+                    {
+                        name: "SHRM-CP / SCP (India)",
+                        feel: "Same global blueprint, but test centres note more scenario items on labour codes, contract staffing, and employee relations nuance.",
+                        tips: [
+                            "Balance global SHRM prep with a refresher on new Labour Codes, POSH, gratuity, and PF/ESI thresholds.",
+                            "Do bilingual (EN/Hindi) flashcards for statutory amounts to speed recall under time pressure.",
+                            "Join SHRM India WhatsApp/Telegram groups for recent candidates’ debriefs and time-management tips."
+                        ]
+                    },
+                    {
+                        name: "IR/Labour Law Certificates (XLRI/NIPM)",
+                        feel: "Case-study and short-answer style, heavy on practical remedies for disputes, strikes, and compliance gaps.",
+                        tips: [
+                            "Outline the legal provision first, then propose a remedy that protects management-union relationships.",
+                            "Memorize timelines (notice of strike, conciliation steps) and forms required under state Shops & Establishment Acts.",
+                            "Practice writing concise 200–300 word answers; markers reward clarity over volume."
+                        ]
+                    }
+                ]
+            }
+        };
 
         // --- Career Roadmaps for Each Specialization ---
         const specializationRoadmaps = [
@@ -971,16 +1091,29 @@
             const [activeTab, setActiveTab] = useState('specializations'); // DEFAULT TAB IS NOW SPECIALIZATIONS
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [compareCountry, setCompareCountry] = useState('UK');
-            const [expandedCard, setExpandedCard] = useState(null); 
-            const [searchTerm, setSearchTerm] = useState(""); 
-            const [schoolRegionFilter, setSchoolRegionFilter] = useState("All"); 
+            const [expandedCard, setExpandedCard] = useState(null);
+            const [searchTerm, setSearchTerm] = useState("");
+            const [schoolRegionFilter, setSchoolRegionFilter] = useState("All");
             const [brainsTab, setBrainsTab] = useState("economics"); // 'economics' or 'psychology'
-            
+
             const [myTimeline, setMyTimeline] = useState([]);
             const [newStepName, setNewStepName] = useState("");
+            const [roadmapModal, setRoadmapModal] = useState(null);
+            const [examInsightModal, setExamInsightModal] = useState(null);
 
             const countryData = certificationData[selectedCountry];
             const comparisonData = certificationData[compareCountry];
+            const examExperience = examExperienceByCountry[selectedCountry];
+
+            const normalizeText = (text = "") => text.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+            const openRoadmap = (certName) => {
+                const normalizedCert = normalizeText(certName);
+                const matches = specializationRoadmaps.filter((roadmap) =>
+                    roadmap.certs.some((certTag) => normalizedCert.includes(normalizeText(certTag)))
+                );
+                setRoadmapModal({ certName, roadmaps: matches.length ? matches : specializationRoadmaps });
+            };
 
             const handleAddStep = (e) => {
                 e.preventDefault();
@@ -1112,42 +1245,19 @@
                                             </p>
                                         </div>
 
-                                        <div className="mb-12 space-y-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-bold text-lg">🧭</div>
-                                                <div>
-                                                    <h3 className="text-xl font-bold text-slate-900">Career roadmaps by specialization</h3>
-                                                    <p className="text-sm text-slate-600">Practical next steps from entry-level to senior ownership for each track.</p>
+                                        <div className="mb-12">
+                                            <div className="bg-gray-900 text-white rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-lg">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl">🧭</div>
+                                                    <div>
+                                                        <h3 className="text-xl font-bold">Career roadmaps on demand</h3>
+                                                        <p className="text-sm text-gray-200">Tap the "Roadmap" button on any certification below to open the step-by-step path for that track.</p>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                                {specializationRoadmaps.map((roadmap, idx) => (
-                                                    <TiltCard key={idx} className="glass-card p-6 rounded-xl border border-white/60 shadow-sm flex flex-col gap-4">
-                                                        <div className="flex items-start justify-between gap-3">
-                                                            <div>
-                                                                <h4 className="text-lg font-bold text-slate-900 leading-tight">{roadmap.title}</h4>
-                                                                <p className="text-sm text-slate-600 mt-1">{roadmap.summary}</p>
-                                                            </div>
-                                                            <span className="text-[11px] font-semibold uppercase tracking-wide bg-gray-900 text-white px-3 py-1 rounded-full">Roadmap</span>
-                                                        </div>
-                                                        <ol className="space-y-3 text-sm text-slate-700">
-                                                            {roadmap.steps.map((step, sIdx) => (
-                                                                <li key={sIdx} className="flex gap-3">
-                                                                    <div className="mt-1 w-2 h-2 rounded-full bg-gray-900 flex-shrink-0"></div>
-                                                                    <div>
-                                                                        <p className="font-semibold text-slate-900">{step.stage}</p>
-                                                                        <p className="leading-snug">{step.detail}</p>
-                                                                    </div>
-                                                                </li>
-                                                            ))}
-                                                        </ol>
-                                                        <div className="flex flex-wrap gap-2 pt-2">
-                                                            {roadmap.certs.map((cert, cIdx) => (
-                                                                <span key={cIdx} className="text-[11px] font-semibold bg-gray-100 text-gray-800 px-3 py-1 rounded-full border border-gray-200">{cert}</span>
-                                                            ))}
-                                                        </div>
-                                                    </TiltCard>
-                                                ))}
+                                                <p className="text-xs uppercase tracking-wide font-semibold bg-white text-gray-900 px-4 py-2 rounded-full inline-flex items-center gap-2 shadow-sm">
+                                                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                    Lean view enabled
+                                                </p>
                                             </div>
                                         </div>
 
@@ -1155,7 +1265,7 @@
                                             {globalCerts.map((category, cIdx) => {
                                                 const currentCountryName = selectedCountry === 'USA' ? 'US' : selectedCountry;
                                                 const filteredRegions = category.regions.filter(r => r.country === currentCountryName || r.country === 'Global');
-                                                
+
                                                 if (filteredRegions.length === 0) return null;
 
                                                 return (
@@ -1172,7 +1282,12 @@
                                                                             <TiltCard key={ctIdx} className="glass-card p-5 rounded-lg">
                                                                                 <h5 className="font-bold text-slate-800">{cert.name}</h5>
                                                                                 <p className="text-sm text-slate-600 mb-4 mt-1">{cert.desc}</p>
-                                                                                <button className="text-gray-900 text-xs font-bold bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition">Learn More</button>
+                                                                                <div className="flex flex-wrap gap-2">
+                                                                                    <button onClick={() => openRoadmap(cert.name)} className="text-white text-xs font-bold bg-gray-900 px-4 py-2 rounded-lg hover:bg-gray-800 transition flex items-center gap-2">
+                                                                                        <MapPin className="w-4 h-4" /> Roadmap
+                                                                                    </button>
+                                                                                    <button className="text-gray-900 text-xs font-bold bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 transition">Learn More</button>
+                                                                                </div>
                                                                             </TiltCard>
                                                                         ))}
                                                                     </div>
@@ -1183,6 +1298,37 @@
                                                 );
                                             })}
                                         </div>
+
+                                        {examExperience && (
+                                            <div className="mt-14">
+                                                <div className="flex items-start gap-4 mb-6">
+                                                    <div className="w-12 h-12 rounded-2xl bg-gray-900 text-white flex items-center justify-center text-2xl shadow-lg">🧪</div>
+                                                    <div>
+                                                        <h3 className="text-2xl font-extrabold text-slate-900">Test-taker insight launcher</h3>
+                                                        <p className="text-slate-600 text-sm mt-2 max-w-3xl">{examExperience.intro}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="grid gap-6 md:grid-cols-2">
+                                                    {examExperience.exams.map((exam, idx) => (
+                                                        <TiltCard key={idx} className="glass-card rounded-xl p-6 border border-white/60 shadow-sm flex flex-col gap-5">
+                                                            <div className="flex items-start justify-between gap-3">
+                                                                <div>
+                                                                    <h4 className="text-lg font-bold text-slate-900 leading-tight">{exam.name}</h4>
+                                                                    <p className="text-sm text-slate-600 mt-2 leading-relaxed">{exam.feel}</p>
+                                                                </div>
+                                                                <span className="text-[11px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-700 px-3 py-1 rounded-full border border-gray-200">Insights</span>
+                                                            </div>
+                                                            <button
+                                                                onClick={() => setExamInsightModal({ ...exam, country: countryData.name })}
+                                                                className="text-white text-xs font-bold bg-gray-900 px-4 py-2 rounded-lg hover:bg-gray-800 transition inline-flex items-center gap-2"
+                                                            >
+                                                                <Headphones className="w-4 h-4" /> View user insight
+                                                            </button>
+                                                        </TiltCard>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
@@ -1471,6 +1617,68 @@
                                             </div>
                                         </div>
                                     </div>
+                                )}
+
+                                {/* Modal Overlays */}
+                                {roadmapModal && (
+                                    <Modal
+                                        title={`${roadmapModal.certName} career roadmap`}
+                                        onClose={() => setRoadmapModal(null)}
+                                    >
+                                        <p className="text-sm text-slate-600 mb-4">We matched this certification to the most relevant roadmaps. Follow the steps to plan your path.</p>
+                                        <div className="space-y-5">
+                                            {roadmapModal.roadmaps.map((roadmap, idx) => (
+                                                <div key={idx} className="border border-slate-200 rounded-xl p-5 bg-gray-50/60">
+                                                    <div className="flex items-start justify-between gap-3 mb-3">
+                                                        <div>
+                                                            <h4 className="text-lg font-bold text-slate-900 leading-tight">{roadmap.title}</h4>
+                                                            <p className="text-sm text-slate-600">{roadmap.summary}</p>
+                                                        </div>
+                                                        <span className="text-[11px] font-semibold uppercase tracking-wide bg-gray-900 text-white px-3 py-1 rounded-full">Roadmap</span>
+                                                    </div>
+                                                    <ol className="space-y-3 text-sm text-slate-700 mb-3">
+                                                        {roadmap.steps.map((step, sIdx) => (
+                                                            <li key={sIdx} className="flex gap-3">
+                                                                <div className="mt-1 w-2 h-2 rounded-full bg-gray-900 flex-shrink-0"></div>
+                                                                <div>
+                                                                    <p className="font-semibold text-slate-900">{step.stage}</p>
+                                                                    <p className="leading-snug">{step.detail}</p>
+                                                                </div>
+                                                            </li>
+                                                        ))}
+                                                    </ol>
+                                                    <div className="flex flex-wrap gap-2 pt-1">
+                                                        {roadmap.certs.map((cert, cIdx) => (
+                                                            <span key={cIdx} className="text-[11px] font-semibold bg-white text-gray-800 px-3 py-1 rounded-full border border-gray-200">{cert}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Modal>
+                                )}
+
+                                {examInsightModal && (
+                                    <Modal
+                                        title={`${examInsightModal.name} – user insight`}
+                                        onClose={() => setExamInsightModal(null)}
+                                    >
+                                        <div className="space-y-4">
+                                            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                                                <p className="text-xs font-semibold uppercase text-gray-500 mb-2">What it feels like</p>
+                                                <p className="text-sm text-slate-700 leading-relaxed">{examInsightModal.feel}</p>
+                                            </div>
+                                            <div className="bg-white border border-gray-200 rounded-xl p-4">
+                                                <p className="text-xs font-semibold uppercase text-gray-500 mb-3">How people pass</p>
+                                                <ul className="space-y-2 text-sm text-slate-700 list-disc list-inside">
+                                                    {examInsightModal.tips.map((tip, idx) => (
+                                                        <li key={idx}>{tip}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                            <div className="text-xs text-gray-500">Country: {examInsightModal.country}</div>
+                                        </div>
+                                    </Modal>
                                 )}
                             </div>
                         </div>
