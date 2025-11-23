@@ -159,6 +159,8 @@
 <body>
     <div id="root"></div>
 
+    <script type="text/babel" src="./specializationsData.js"></script>
+
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
@@ -1084,6 +1086,172 @@
             ]
         };
 
+        // --- Country Specializations Components ---
+        const specializationsData = window.COUNTRY_SPECIALIZATIONS || {};
+
+        const CertificationCard = ({ cert, expanded, onToggle }) => (
+            <div className="glass-card rounded-xl p-5 border border-white/60 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <h5 className="text-lg font-bold text-slate-900 leading-tight">{cert.name}</h5>
+                        <p className="text-sm text-slate-600 mt-1">Level: {cert.level} • Recognition: {cert.recognition}</p>
+                    </div>
+                    <span className="text-[11px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-700 px-3 py-1 rounded-full border border-gray-200">{cert.difficulty}</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-700 mt-4">
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-1">Cost</p>
+                        <p className="font-semibold text-gray-900">{cert.costRange}</p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-1">Duration</p>
+                        <p className="font-semibold text-gray-900">{cert.duration}</p>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-1">Recognition</p>
+                        <p className="font-semibold text-gray-900">{cert.recognition}</p>
+                    </div>
+                </div>
+
+                <div className="mt-4 flex justify-between items-center">
+                    <div className="text-xs text-gray-500">Career tracks: {cert.careers.length}</div>
+                    <button onClick={onToggle} className="text-sm font-bold text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-200 transition flex items-center gap-2">
+                        {expanded ? 'Hide details' : 'More details'} <ChevronDown className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                    </button>
+                </div>
+
+                {expanded && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">Career paths</p>
+                            <div className="flex flex-wrap gap-2">
+                                {cert.careers.map((career, idx) => (
+                                    <span key={idx} className="text-xs font-semibold text-gray-800 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">{career}</span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">User insights</p>
+                            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                {cert.userInsights.map((insight, idx) => <li key={idx}>{insight}</li>)}
+                            </ul>
+                        </div>
+
+                        {cert.costBreakdown && (
+                            <div>
+                                <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">Cost breakdown</p>
+                                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                    {cert.costBreakdown.map((item, idx) => <li key={idx}>{item}</li>)}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div>
+                            <p className="text-[11px] font-bold uppercase tracking-wide text-gray-500 mb-2">How to pass</p>
+                            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                                {cert.howToPass.map((tip, idx) => <li key={idx}>{tip}</li>)}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+            </div>
+        );
+
+        const SpecializationCard = ({ spec, isActive, onSelect }) => (
+            <div
+                onClick={() => onSelect(spec.id)}
+                className={`cursor-pointer rounded-xl border transition-all p-5 ${isActive ? 'bg-white shadow-md border-gray-900/10 ring-1 ring-gray-900/10' : 'bg-white/70 border-white/70 hover:border-gray-200 hover:shadow-sm'}`}
+            >
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <p className="text-[11px] uppercase tracking-wide font-bold text-gray-500 mb-1">Specialization</p>
+                        <h4 className="text-lg font-bold text-slate-900">{spec.name}</h4>
+                        <p className="text-sm text-slate-600 mt-2 leading-relaxed">{spec.overview}</p>
+                    </div>
+                    <span className={`text-[11px] font-semibold uppercase tracking-wide px-3 py-1 rounded-full border ${isActive ? 'bg-gray-900 text-white border-gray-900' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+                        {isActive ? 'Active' : 'Roadmap'}
+                    </span>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                    <div className="text-xs text-gray-500 font-semibold">Certifications: {spec.certifications.length}</div>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onSelect(spec.id); }}
+                        className="text-xs font-bold text-gray-900 bg-gray-100 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-200 transition inline-flex items-center gap-2"
+                    >
+                        <MapPin className="w-4 h-4" /> View certification roadmap
+                    </button>
+                </div>
+            </div>
+        );
+
+        const CountrySpecializationsSection = ({ countryKey }) => {
+            const data = specializationsData[countryKey];
+            const [activeSpecId, setActiveSpecId] = useState(data?.specializations?.[0]?.id || null);
+            const [expandedCerts, setExpandedCerts] = useState({});
+
+            useEffect(() => {
+                setActiveSpecId(data?.specializations?.[0]?.id || null);
+                setExpandedCerts({});
+            }, [countryKey, data]);
+
+            if (!data || !data.specializations?.length) return null;
+
+            const activeSpec = data.specializations.find(spec => spec.id === activeSpecId) || data.specializations[0];
+
+            const toggleCert = (certId) => {
+                setExpandedCerts(prev => ({ ...prev, [certId]: !prev[certId] }));
+            };
+
+            return (
+                <div id="country-roadmaps" className="mt-14">
+                    <div className="bg-gray-50/80 border border-gray-200 rounded-2xl p-6 lg:p-8 shadow-inner">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-wide text-gray-500">Specializations & Certification Roadmaps</p>
+                                <h3 className="text-2xl font-extrabold text-slate-900 mt-1">Explore HR tracks in {data.countryName}</h3>
+                                <p className="text-slate-600 text-sm mt-2">Explore HR specializations, certifications, costs, and career paths in this country.</p>
+                            </div>
+                            <div className="bg-white px-4 py-2 rounded-full border border-gray-200 text-xs font-bold text-gray-700 shadow-sm">Deep dive for {data.countryName}</div>
+                        </div>
+
+                        <div className="grid gap-6 lg:grid-cols-12 mt-8">
+                            <div className="lg:col-span-5 space-y-4">
+                                {data.specializations.map((spec) => (
+                                    <SpecializationCard key={spec.id} spec={spec} isActive={activeSpec?.id === spec.id} onSelect={setActiveSpecId} />
+                                ))}
+                            </div>
+
+                            <div className="lg:col-span-7">
+                                <div className="glass-card rounded-2xl p-6 border border-white/70 shadow-lg">
+                                    <div className="flex items-start justify-between gap-3 mb-4">
+                                        <div>
+                                            <p className="text-[11px] uppercase tracking-wide font-bold text-gray-500 mb-1">Specialization overview</p>
+                                            <h4 className="text-xl font-bold text-slate-900">{activeSpec.name}</h4>
+                                        </div>
+                                        <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-full border border-gray-200">{activeSpec.certifications.length} certifications</span>
+                                    </div>
+                                    <p className="text-sm text-slate-700 leading-relaxed mb-6">{activeSpec.overview}</p>
+
+                                    <div className="space-y-4">
+                                        {activeSpec.certifications.map(cert => (
+                                            <CertificationCard
+                                                key={cert.id}
+                                                cert={cert}
+                                                expanded={!!expandedCerts[cert.id]}
+                                                onToggle={() => toggleCert(cert.id)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         // --- Main App ---
         const App = () => {
             const [showIntro, setShowIntro] = useState(true);
@@ -1113,6 +1281,13 @@
                     roadmap.certs.some((certTag) => normalizedCert.includes(normalizeText(certTag)))
                 );
                 setRoadmapModal({ certName, roadmaps: matches.length ? matches : specializationRoadmaps });
+            };
+
+            const scrollToRoadmaps = () => {
+                const target = document.getElementById('country-roadmaps');
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             };
 
             const handleAddStep = (e) => {
@@ -1245,6 +1420,27 @@
                                             </p>
                                         </div>
 
+                                        <div className="bg-white/70 border border-white/80 rounded-2xl p-4 mb-8 shadow-sm flex flex-wrap items-center gap-3 justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center text-lg">🌎</div>
+                                                <div>
+                                                    <p className="text-sm font-semibold text-slate-800">Deep dive by country</p>
+                                                    <p className="text-xs text-slate-600">Jump straight to the specialization roadmaps for {countryData.name}.</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {Object.keys(certificationData).map((key) => (
+                                                    <button
+                                                        key={key}
+                                                        onClick={() => { setSelectedCountry(key); scrollToRoadmaps(); }}
+                                                        className={`px-3 py-2 text-xs font-bold rounded-lg border ${selectedCountry === key ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'}`}
+                                                    >
+                                                        {certificationData[key].flag} {certificationData[key].name}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
                                         <div className="mb-12">
                                             <div className="bg-gray-900 text-white rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-lg">
                                                 <div className="flex items-center gap-3">
@@ -1329,6 +1525,8 @@
                                                 </div>
                                             </div>
                                         )}
+
+                                        <CountrySpecializationsSection key={selectedCountry} countryKey={selectedCountry} />
                                     </div>
                                 )}
 
