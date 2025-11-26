@@ -376,6 +376,85 @@ const COUNTRY_SPECIALIZATIONS = {
         ]
       }
     ]
+  },
+  Dubai: {
+    countryName: "Dubai / UAE",
+    specializations: [
+      {
+        id: "hr-generalist-ae",
+        name: "HR Generalist & Labour Law",
+        overview: "Focuses on UAE Labour Law, free-zone nuances, and people operations in a multicultural workforce.",
+        certifications: [
+          {
+            id: "uae-labour-law",
+            name: "UAE Labour Law Certificate",
+            level: "Intermediate",
+            recognition: "National",
+            costRange: "AED 2,500–AED 4,000",
+            duration: "2–3 months",
+            difficulty: "7/10",
+            careers: ["HR Generalist", "HR Executive", "Employee Relations Officer"],
+            userInsights: [
+              "Free zones vs. mainland rules trip up many first-time candidates—keep a comparison chart handy.",
+              "Mock case studies on terminations and gratuity calculations are the best prep."
+            ],
+            costBreakdown: ["Tuition: AED 2.5k–AED 4k", "Study guides: ~AED 300", "Workshops: optional AED 500"],
+            howToPass: [
+              "Practice gratuity math under tight timing.",
+              "Summarize notice and leave entitlements by zone.",
+              "Review sample disciplinary letters that align with MOHRE guidance."
+            ]
+          },
+          {
+            id: "cipd-dubai",
+            name: "CIPD Level 5 (UAE delivery)",
+            level: "Intermediate",
+            recognition: "Regional / Global",
+            costRange: "AED 12,000–AED 18,000",
+            duration: "6–12 months",
+            difficulty: "7/10",
+            careers: ["People Advisor", "HRBP", "HR Manager"],
+            userInsights: [
+              "Assignments need evidence from your Dubai workplace—gather policies and metrics early.",
+              "Tutors expect links to both CIPD and UAE labour standards."
+            ],
+            costBreakdown: ["Tuition: AED 12k–AED 18k", "Membership: ~AED 800", "Workshops: AED 500"],
+            howToPass: [
+              "Use CIPD Profession Map behaviours in every reflection.",
+              "Pair each assignment with a UAE-specific compliance note.",
+              "Book feedback slots with tutors each month."
+            ]
+          }
+        ]
+      },
+      {
+        id: "total-rewards-ae",
+        name: "Total Rewards & Mobility",
+        overview: "Covers GCC pay design, gratuity and end-of-service, allowances, and mobility for expat-heavy teams.",
+        certifications: [
+          {
+            id: "gratuity-specialist",
+            name: "GCC Gratuity & Payroll Specialist",
+            level: "Intermediate",
+            recognition: "Regional",
+            costRange: "AED 3,000–AED 5,000",
+            duration: "3–5 months",
+            difficulty: "7/10",
+            careers: ["Payroll Specialist", "Compensation Analyst", "HR Operations Lead"],
+            userInsights: [
+              "Currency fluctuations and housing allowances are common scenario questions.",
+              "Candidates recommend memorizing gratuity breakpoints for limited vs. unlimited contracts."
+            ],
+            costBreakdown: ["Course: AED 3k–AED 5k", "Practice exams: ~AED 400", "Workshops: AED 600"],
+            howToPass: [
+              "Drill end-of-service benefit calculations weekly.",
+              "Build a sample payroll file that includes allowances, flights, and school fees.",
+              "Stay current on visa categories and medical insurance minimums."
+            ]
+          }
+        ]
+      }
+    ]
   }
 };
 
